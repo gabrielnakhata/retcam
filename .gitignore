@@ -1,0 +1,17 @@
+# Android/Gradle
+.gradle/
+build/
+*/build/
+
+# Local configuration
+local.properties
+.idea/
+*.iml
+
+# Log/Crash reports
+*.log
+captures/
+
+# OS files
+.DS_Store
+Thumbs.db

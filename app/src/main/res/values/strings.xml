@@ -1,0 +1,40 @@
+<resources>
+    <string name="app_name">Return Truck</string>
+    <string name="txt_login">Nome Usuário</string>
+    <string name="txt_passw">Senha</string>
+    <string name="msg_login">Bem Vindo!</string>
+    <string name="btn_entrar">Acessar</string>
+    <string name="title_activity_init">InitActivity</string>
+    <string name="txt_numero">Código Vendedor</string>
+    <string name="txt_rota">Rota</string>
+    <string name="txt_contagem">Contagem</string>
+    <string name="txt_vend">Vendedor</string>
+    <string name="txt_infinit">Informações para identificação da carga</string>
+    <string name="btn_avancar">Avançar</string>
+    <string name="btn_voltar">Voltar</string>
+    <string name="btn_finalizar">Finalizar</string>
+    <string name="lyd_coddiscri">Código</string>
+    <string name="lyd_discri">Descrição</string>
+    <string name="lyd_dev">Devolução     </string>
+    <string name="lyd_troca">Troca    </string>
+    <string name="lyd_retorno">Retorno   </string>
+    <string name="lyd_bonific">Bonificação  </string>
+    <string name="lyd_perda">Perda   </string>
+    <string name="lyd_qtdpce">Qtd. Cx   </string>
+    <string name="lyd_ifcfg">Configurador  </string>
+    <string name="lyd_ws">Endereço Web Service Protheus  </string>
+    <string name="lyd_time">Timeout  </string>
+    <string name="btn_fnlcfg">Finalizar  </string>
+    <string name="btn_rota">Rota  </string>
+    <string name="lyd_desrota">Descrição Rota  </string>
+    <string name="lyd_aguarde">Aguarde... </string>
+    <string name="lyd_versao">Versão 1.5</string>
+    <string name="title_activity_perda">activity_perda</string>
+    <string name="lyd_tela">Inclusão de Perdas</string>
+    <string name="lyd_perdaPrd">Produto</string>
+    <string name="lyd_codPrdPerda">Código</string>
+    <string name="lyd_desPrdPerda">Descrição</string>
+    <string name="lyd_qtdPerda">Qtd. Perda</string>
+    <string name="btn_salvarPerda">Salvar</string>
+
+</resources>
