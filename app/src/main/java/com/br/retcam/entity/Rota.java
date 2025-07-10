@@ -2,12 +2,12 @@ package com.br.retcam.entity;
 
 public class Rota {
 
-    private boolean retorno;
-    private String rota;
-    private String descricao;
-    private String vendedor;
-    private String nome_vend;
-    private String msg;
+    private boolean retorno = false;
+    private String rota = "";
+    private String descricao = "";
+    private String vendedor = "";
+    private String nome_vend = "";
+    private String msg = "";
 
     public boolean getRetorno() {
         return retorno;

@@ -2,9 +2,9 @@ package com.br.retcam.entity;
 
 public class Integracao {
 
-    private boolean retorno;
-    private String codRet;
-    private String msg;
+    private boolean retorno = false;
+    private String codRet = "";
+    private String msg = "";
 
     public boolean getRetorno() {
         return retorno;
@@ -28,5 +28,14 @@ public class Integracao {
 
     public void setCodRet(String codRet) {
         this.codRet = codRet;
+    }
+
+    @Override
+    public String toString() {
+        return "Integracao{" +
+                "retorno=" + retorno +
+                ", codRet='" + codRet + '\'' +
+                ", msg='" + msg + '\'' +
+                '}';
     }
 }

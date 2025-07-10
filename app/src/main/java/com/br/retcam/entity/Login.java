@@ -2,7 +2,7 @@ package com.br.retcam.entity;
 
 public class Login {
 
-    private boolean retorno;
+    private boolean retorno = false;
 
     public boolean getRetorno() {
         return retorno;
@@ -14,6 +14,8 @@ public class Login {
 
     @Override
     public String toString() {
-        return "Retorno:"+getRetorno();
+        return "Login{" +
+               "retorno=" + retorno +
+               '}';
     }
 }

@@ -13,11 +13,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activity_perda" android:exported="false" />
-        <activity android:name=".activity_cfg" android:exported="false" />
-        <activity android:name=".activity_list" android:exported="false" />
-        <activity android:name=".activity_init" android:exported="false" />
-        <activity android:name=".activity_main" android:exported="true">
+        <activity android:name=".ActivityPerda" android:exported="false" />
+        <activity android:name=".ActivityCfg" android:exported="false" />
+        <activity android:name=".ActivityList" android:exported="false" />
+        <activity android:name=".ActivityInit" android:exported="false" />
+        <activity android:name=".ActivityMain" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
