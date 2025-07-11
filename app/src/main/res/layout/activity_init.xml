@@ -194,6 +194,22 @@
 
         </LinearLayout>
 
+        <!-- Botão de fechar no rodapé -->
+        <Button
+            android:id="@+id/btn_fechar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:text="Fechar Aplicativo"
+            android:onClick="fecharApp"
+            android:backgroundTint="#FF0000"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

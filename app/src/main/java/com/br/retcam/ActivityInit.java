@@ -156,6 +156,16 @@ public class ActivityInit extends AppCompatActivity {
         txtQtdcx.setText("");
     }
 
+    /**
+     * Fecha o aplicativo quando o botão de fechar é pressionado
+     * @param view View que disparou o evento
+     */
+    public void fecharApp(View view) {
+        // Finaliza todas as atividades e fecha o aplicativo
+        finishAffinity();
+        System.exit(0);
+    }
+
     private class RotaTask extends AsyncTask<Void, Void, Void> {
         private final String rota, urlWs, timeOut, login, senha;
         private final ProgressBar progressBar;

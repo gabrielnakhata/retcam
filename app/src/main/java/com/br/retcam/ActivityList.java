@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.br.retcam.entity.Integracao;
 import com.br.retcam.entity.Perda;
 import com.br.retcam.entity.Produtos;
+import com.br.retcam.entity.ResultadoIntegracao;
 import com.br.retcam.lib.RTGlobal;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -404,11 +405,9 @@ public class ActivityList extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             Gson gson = new Gson();
-            String urlCnx = urlWs + "integracao?ctipo=PR";
             HttpsURLConnection urlConnection = null;
 
             try {
-                // SSL TrustManager
                 final X509TrustManager cert = new X509TrustManager() {
                     public X509Certificate[] getAcceptedIssuers() { return null; }
                     public void checkServerTrusted(X509Certificate[] certs, String authType) {}
@@ -418,11 +417,11 @@ public class ActivityList extends AppCompatActivity {
                 SSLContext sc = SSLContext.getInstance("SSL");
                 sc.init(null, new TrustManager[]{cert}, new java.security.SecureRandom());
                 HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
                 HostnameVerifier hv = (hostname, session) -> true;
 
-                // Configuração da conexão
-                URL url = new URL(urlCnx);
+                // === 1ª REQUISIÇÃO: Produtos ===
+                String urlProdutos = urlWs + "integracao?ctipo=PR";
+                URL url = new URL(urlProdutos);
                 urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setDefaultHostnameVerifier(hv);
                 urlConnection.setUseCaches(false);
@@ -433,21 +432,17 @@ public class ActivityList extends AppCompatActivity {
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setRequestProperty("Content-Type", "application/json");
 
-                // Adiciona cabeçalho Basic Auth
                 String credentials = login + ":" + senha;
                 String basicAuth = "Basic " + android.util.Base64.encodeToString(credentials.getBytes(), android.util.Base64.NO_WRAP);
                 urlConnection.setRequestProperty("Authorization", basicAuth);
-
                 urlConnection.setFixedLengthStreamingMode(jsonProdutos.length());
                 urlConnection.connect();
 
-                // Envia os dados
                 try (OutputStreamWriter os = new OutputStreamWriter(urlConnection.getOutputStream())) {
                     os.write(jsonProdutos);
                     os.flush();
                 }
 
-                // Lê a resposta
                 BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 StringBuilder buffer = new StringBuilder();
                 String linha;
@@ -455,24 +450,69 @@ public class ActivityList extends AppCompatActivity {
                     buffer.append(linha).append("\n");
                 }
                 reader.close();
+                urlConnection.disconnect();
 
-                Type collectionType = new TypeToken<Integracao>() {}.getType();
-                Integracao integracao = gson.fromJson(buffer.toString(), collectionType);
+                ResultadoIntegracao resultado = gson.fromJson(buffer.toString(), ResultadoIntegracao.class);
+                String codRet = null;
 
-                if (integracao != null && integracao.getRetorno()) {
+                if (resultado != null && resultado.getRetorno()) {
                     integracaows.setRetorno(true);
-                    integracaows.setMsg(integracao.getMsg());
+                    integracaows.setMsg(resultado.getMsg());
+                    codRet = resultado.getCodRet();
+                } else {
+                    integracaows.setRetorno(false);
+                    integracaows.setMsg("Erro ao integrar produtos.");
+                    return null;
+                }
+
+                // === 2ª REQUISIÇÃO: Perdas ===
+                if (codRet != null && !jsonPerdas.equals("[]")) {
+                    String urlPerdas = urlWs + "integracao?ctipo=PE&ccodret=" + codRet;
+                    url = new URL(urlPerdas);
+                    urlConnection = (HttpsURLConnection) url.openConnection();
+                    urlConnection.setDefaultHostnameVerifier(hv);
+                    urlConnection.setUseCaches(false);
+                    urlConnection.setReadTimeout(10000);
+                    urlConnection.setConnectTimeout(Integer.parseInt(timeOut));
+                    urlConnection.setDoInput(true);
+                    urlConnection.setDoOutput(true);
+                    urlConnection.setRequestMethod("POST");
+                    urlConnection.setRequestProperty("Content-Type", "application/json");
+                    urlConnection.setRequestProperty("Authorization", basicAuth);
+                    urlConnection.setFixedLengthStreamingMode(jsonPerdas.length());
+                    urlConnection.connect();
+
+                    try (OutputStreamWriter os = new OutputStreamWriter(urlConnection.getOutputStream())) {
+                        os.write(jsonPerdas);
+                        os.flush();
+                    }
+
+                    reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                    buffer = new StringBuilder();
+                    while ((linha = reader.readLine()) != null) {
+                        buffer.append(linha).append("\n");
+                    }
+                    reader.close();
+                    urlConnection.disconnect();
+
+                    ResultadoIntegracao resultadoPerdas = gson.fromJson(buffer.toString(), ResultadoIntegracao.class);
+                    if (resultadoPerdas != null) {
+                        Log.d("EnvioPerdas", "Resultado: " + resultadoPerdas.getRetorno() + " - " + resultadoPerdas.getMsg());
+                    } else {
+                        Log.e("EnvioPerdas", "Não foi possível interpretar a resposta do servidor");
+                    }
                 }
 
             } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
                 Log.e("IntegracaoTask", "Erro: " + e.getMessage(), e);
+                integracaows.setRetorno(false);
+                integracaows.setMsg("Erro na integração.");
             } finally {
                 if (urlConnection != null) {
                     urlConnection.disconnect();
                 }
             }
 
-            Log.d("Integração", integracaows.toString());
             return null;
         }
     }
@@ -564,12 +604,11 @@ public class ActivityList extends AppCompatActivity {
             integracaoTask.execute();
 
             Toast.makeText(ActivityList.this, "O formulário de devolução foi entregue com sucesso!", Toast.LENGTH_SHORT).show();
+
             Intent itInit = new Intent(this, ActivityInit.class);
-            it.putExtra("rota", rota.toString());
-            it.putExtra("desrota", desrota.toString());
-            it.putExtra("usuario", usuario);
-            it.putExtra("senha", senha);
-            startActivityForResult(it, 1);
+            itInit.putExtra("usuario", usuario);
+            itInit.putExtra("senha", senha);
+
             startActivity(itInit);
 
         } else {
