@@ -2,19 +2,21 @@ package com.br.retcam.entity;
 
 public class Produtos {
 
-    private String codigoproduto;
-    private String descricao;
-    private String devolucao;
-    private String troca;
-    private String retcarga;
-    private String bonificacao;
-    private String perda;
-    private String rota;
-    private String desrota;
-    private String codvend;
-    private String nomevend;
-    private String qtdcaixa;
-    private String usuario;
+    private String codigoproduto = "";
+    private String descricao = "";
+    private String devolucao = "";
+    private String troca = "";
+    private String retcarga = "";
+    private String bonificacao = "";
+    private String perda = "";
+    private String rota = "";
+    private String desrota = "";
+    private String codvend = "";
+    private String nomevend = "";
+    private String qtdcaixa = "";
+    private String usuario = "";
+    private String dataAcerto = "";
+    private String notasFiscais = "";
 
     public String getCodigoproduto() {
         return codigoproduto;
@@ -120,4 +122,33 @@ public class Produtos {
         this.usuario = usuario;
     }
 
-  }
+    public void setDataAcerto(String format) {
+        this.dataAcerto = format;
+    }
+
+    public void setNotasFiscais(String s) {
+        this.notasFiscais = s;
+    }
+
+    @Override
+    public String toString() {
+        return "Produtos{" +
+                "codigoproduto='" + codigoproduto + '\'' +
+                ", descricao='" + descricao + '\'' +
+                ", devolucao='" + devolucao + '\'' +
+                ", troca='" + troca + '\'' +
+                ", retcarga='" + retcarga + '\'' +
+                ", bonificacao='" + bonificacao + '\'' +
+                ", perda='" + perda + '\'' +
+                ", rota='" + rota + '\'' +
+                ", desrota='" + desrota + '\'' +
+                ", codvend='" + codvend + '\'' +
+                ", nomevend='" + nomevend + '\'' +
+                ", qtdcaixa='" + qtdcaixa + '\'' +
+                ", usuario='" + usuario + '\'' +
+                ", dataAcerto='" + dataAcerto + '\'' +
+                ", notasFiscais='" + notasFiscais + '\'' +
+                '}';
+
+    }
+}

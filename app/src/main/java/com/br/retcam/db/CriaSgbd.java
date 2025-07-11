@@ -4,7 +4,9 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-//Cria o banco de dados SQLLITE
+/**
+ * Classe responsável por criar e gerenciar o banco de dados SQLite
+ */
 public class CriaSgbd extends SQLiteOpenHelper {
 
     public static final String NOME_BANCO  = "retcam.db";
@@ -14,26 +16,37 @@ public class CriaSgbd extends SQLiteOpenHelper {
     public static final String TIMEOUT     = "timeout";
     public static final int VERSAO         = 1;
 
+    /**
+     * Construtor do banco de dados
+     * @param context Contexto da aplicação
+     */
     public CriaSgbd(Context context){
-        super(context, NOME_BANCO,null,VERSAO);
+        super(context, NOME_BANCO, null, VERSAO);
     }
 
-    //Cria a tabela
+    /**
+     * Cria a estrutura da tabela quando o banco é criado pela primeira vez
+     * @param db Instância do banco de dados
+     */
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String sql  = "CREATE TABLE "+TABELA+"("
-                    + ID + " integer primary key autoincrement,"
-                    + WS + " text,"
-                    + TIMEOUT + " text"
-                    +")";
+        String sql = "CREATE TABLE " + TABELA + " ("
+                  + ID + " integer primary key autoincrement, "
+                  + WS + " text, "
+                  + TIMEOUT + " text"
+                  + ")";
         db.execSQL(sql);
     }
 
-    //Apaga a tabela caso exista
+    /**
+     * Atualiza a estrutura do banco em caso de mudança de versão
+     * @param db Instância do banco de dados
+     * @param oldVersion Versão antiga
+     * @param newVersion Nova versão
+     */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS "+ TABELA +";s");
+        db.execSQL("DROP TABLE IF EXISTS " + TABELA);
         onCreate(db);
     }
-
 }

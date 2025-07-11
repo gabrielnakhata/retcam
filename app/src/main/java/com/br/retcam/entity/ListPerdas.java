@@ -2,10 +2,10 @@ package com.br.retcam.entity;
 
 public class ListPerdas {
 
-    private String codProduto;
-    private String codPerda;
-    private String desPerda;
-    private String qtdPerda;
+    private String codProduto = "";
+    private String codPerda = "";
+    private String desPerda = "";
+    private String qtdPerda = "";
 
     public String getCodProduto() {
         return codProduto;
@@ -37,5 +37,15 @@ public class ListPerdas {
 
     public void setQtdPerda(String qtdPerda) {
         this.qtdPerda = qtdPerda;
+    }
+
+    @Override
+    public String toString() {
+        return "ListPerdas{" +
+                "codProduto='" + codProduto + '\'' +
+                ", codPerda='" + codPerda + '\'' +
+                ", desPerda='" + desPerda + '\'' +
+                ", qtdPerda='" + qtdPerda + '\'' +
+                '}';
     }
 }

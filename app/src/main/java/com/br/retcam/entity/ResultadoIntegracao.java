@@ -1,10 +1,12 @@
 package com.br.retcam.entity;
 
-public class Integracao {
-
-    private boolean retorno = false;
-    private String codRet = "";
-    private String msg = "";
+/**
+ * Classe que representa o retorno da integração com o WebService
+ */
+public class ResultadoIntegracao {
+    private boolean retorno;
+    private String codRet;
+    private String msg;
 
     public boolean getRetorno() {
         return retorno;
@@ -12,14 +14,6 @@ public class Integracao {
 
     public void setRetorno(boolean retorno) {
         this.retorno = retorno;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
     }
 
     public String getCodRet() {
@@ -30,9 +24,17 @@ public class Integracao {
         this.codRet = codRet;
     }
 
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
     @Override
     public String toString() {
-        return "Integracao{" +
+        return "ResultadoIntegracao{" +
                 "retorno=" + retorno +
                 ", codRet='" + codRet + '\'' +
                 ", msg='" + msg + '\'' +
