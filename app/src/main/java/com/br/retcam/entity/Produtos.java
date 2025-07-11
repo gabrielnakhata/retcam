@@ -15,6 +15,8 @@ public class Produtos {
     private String nomevend = "";
     private String qtdcaixa = "";
     private String usuario = "";
+    private String dataAcerto = "";
+    private String notasFiscais = "";
 
     public String getCodigoproduto() {
         return codigoproduto;
@@ -120,6 +122,14 @@ public class Produtos {
         this.usuario = usuario;
     }
 
+    public void setDataAcerto(String format) {
+        this.dataAcerto = format;
+    }
+
+    public void setNotasFiscais(String s) {
+        this.notasFiscais = s;
+    }
+
     @Override
     public String toString() {
         return "Produtos{" +
@@ -136,6 +146,9 @@ public class Produtos {
                 ", nomevend='" + nomevend + '\'' +
                 ", qtdcaixa='" + qtdcaixa + '\'' +
                 ", usuario='" + usuario + '\'' +
+                ", dataAcerto='" + dataAcerto + '\'' +
+                ", notasFiscais='" + notasFiscais + '\'' +
                 '}';
+
     }
 }

@@ -32,21 +32,20 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -63,19 +62,21 @@ public class ActivityList extends AppCompatActivity {
     private String urlWs = "";
     private String timeOut = "";
     private TableLayout tableLayout;
+    private String usuario = "";
+    private String senha = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
-        // Inicialização dos componentes
         tableLayout = findViewById(R.id.list_merc);
         progressBar = findViewById(R.id.progressBar);
 
-        // Recupera os dados da rota da intent
         Intent it = getIntent();
         rota = it.getStringExtra("rota");
+        usuario = it.getStringExtra("usuario");
+        senha = it.getStringExtra("senha");
 
         // Limpa a lista de perdas
         if (RTGlobal.getInstance().getListaPerdas() != null &&
@@ -118,7 +119,7 @@ public class ActivityList extends AppCompatActivity {
             timeOut = dadosWs[1];
 
             // Executa conexão WS Protheus
-            conexaPrd = new ProdutoTask(rota, urlWs, timeOut).execute().get();
+            conexaPrd = new ProdutoTask(rota, urlWs, timeOut,  usuario, senha).execute().get();
 
             if (conexaPrd == null) {
                 Toast.makeText(ActivityList.this, "Erro na conexão com web service Protheus.", Toast.LENGTH_SHORT).show();
@@ -235,16 +236,21 @@ public class ActivityList extends AppCompatActivity {
     /**
      * Executa conexão WS com Protheus - Produtos
      */
+
     private class ProdutoTask extends AsyncTask<Void, Void, List<Produtos>> {
 
         private final String rota;
         private final String urlWs;
         private final String timeOut;
+        private final String login;
+        private final String senha;
 
-        public ProdutoTask(String rota, String urlWs, String timeOut) {
+        public ProdutoTask(String rota, String urlWs, String timeOut, String login, String senha) {
             this.rota = rota;
             this.urlWs = urlWs;
             this.timeOut = timeOut;
+            this.login = login;
+            this.senha = senha;
         }
 
         @Override
@@ -256,64 +262,49 @@ public class ActivityList extends AppCompatActivity {
             HttpsURLConnection urlConnection = null;
 
             try {
-                // Configuração do SSL
+                // SSL TrustManager
                 final X509TrustManager cert = new X509TrustManager() {
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                    public void checkServerTrusted(X509Certificate[] certs, String authType) throws java.security.cert.CertificateException {
-                        return;
-                    }
-
-                    public void checkClientTrusted(X509Certificate[] certs, String authType) throws java.security.cert.CertificateException {
-                        return;
-                    }
+                    public X509Certificate[] getAcceptedIssuers() { return null; }
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) {}
                 };
 
-                // Cria socket SSL
                 SSLContext sc = SSLContext.getInstance("SSL");
-                sc.init(null, new TrustManager[] { cert }, null);
-
-                // Ativa o socket para a requisição
+                sc.init(null, new TrustManager[]{cert}, new java.security.SecureRandom());
                 HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
-                final HostnameVerifier hv = new HostnameVerifier() {
-                    public boolean verify(String urlHostName, SSLSession session) {
-                        return true;
-                    }
-                };
+                HostnameVerifier hv = (hostname, session) -> true;
 
-                if (android.os.Debug.isDebuggerConnected())
-                    android.os.Debug.waitForDebugger();
-
-                // Retorna a lista de produtos
+                // --- Requisição de produtos ---
                 URL url = new URL(urlCnx);
-                gson = new Gson();
                 urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setDefaultHostnameVerifier(hv);
                 urlConnection.setRequestMethod("GET");
                 urlConnection.setRequestProperty("Content-type", "application/json");
                 urlConnection.setRequestProperty("Accept", "application/json");
-                urlConnection.setDoOutput(true);
-                urlConnection.setConnectTimeout(Integer.valueOf(timeOut));
+
+                // Basic Auth
+                String credentials = login + ":" + senha;
+                String basicAuth = "Basic " + android.util.Base64.encodeToString(credentials.getBytes(), android.util.Base64.NO_WRAP);
+                urlConnection.setRequestProperty("Authorization", basicAuth);
+
+                urlConnection.setConnectTimeout(Integer.parseInt(timeOut));
                 urlConnection.connect();
 
-                InputStream inputStream = url.openStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                StringBuilder buffer = new StringBuilder();
                 String linha;
-                StringBuffer buffer = new StringBuffer();
                 while ((linha = reader.readLine()) != null) {
-                    System.out.println(linha);
-                    buffer.append(linha + "\n");
+                    buffer.append(linha).append("\n");
                 }
+                reader.close();
 
                 Type collectionType = new TypeToken<List<Produtos>>() {}.getType();
                 retProdutos = gson.fromJson(buffer.toString(), collectionType);
                 urlConnection.disconnect();
 
-                if (retProdutos != null && retProdutos.size() > 0) {
-                    // Retorna o cadastro de perdas
+                // --- Requisição de perdas ---
+                if (retProdutos != null && !retProdutos.isEmpty()) {
                     urlCnx = urlWs + "perda/";
                     url = new URL(urlCnx);
                     urlConnection = (HttpsURLConnection) url.openConnection();
@@ -321,44 +312,36 @@ public class ActivityList extends AppCompatActivity {
                     urlConnection.setRequestMethod("GET");
                     urlConnection.setRequestProperty("Content-type", "application/json");
                     urlConnection.setRequestProperty("Accept", "application/json");
-                    urlConnection.setDoOutput(true);
-                    urlConnection.setConnectTimeout(Integer.valueOf(timeOut));
+
+                    urlConnection.setRequestProperty("Authorization", basicAuth); // reutiliza o mesmo header
+                    urlConnection.setConnectTimeout(Integer.parseInt(timeOut));
                     urlConnection.connect();
 
-                    inputStream = url.openStream();
-                    reader = new BufferedReader(new InputStreamReader(inputStream));
-                    buffer = new StringBuffer();
+                    reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                    buffer = new StringBuilder();
                     while ((linha = reader.readLine()) != null) {
-                        System.out.println(linha);
-                        buffer.append(linha + "\n");
+                        buffer.append(linha).append("\n");
                     }
+                    reader.close();
 
                     collectionType = new TypeToken<List<Perda>>() {}.getType();
                     perda = gson.fromJson(buffer.toString(), collectionType);
 
-                    if (perda != null && perda.size() > 0) {
+                    if (perda != null && !perda.isEmpty()) {
                         RTGlobal.getInstance().setPerda(perda);
                     }
 
                     urlConnection.disconnect();
                 }
 
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (KeyManagementException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                Log.e("ProdutoTask", "Erro: " + e.getMessage(), e);
             }
 
-            if (retProdutos != null) {
-                Log.d("Rota ", retProdutos.toString());
-            }
             return retProdutos;
         }
     }
+
 
     /**
      * Processa o retorno da integração
@@ -384,20 +367,25 @@ public class ActivityList extends AppCompatActivity {
     /**
      * Task assíncrona para execução da integração com WebService
      */
+
     private class IntegracaoTask extends AsyncTask<Void, Void, Void> {
 
-        private String jsonProdutos;
-        private String jsonPerdas;
+        private final String jsonProdutos;
+        private final String jsonPerdas;
         private final String urlWs;
         private final String timeOut;
         private final ProgressBar progressBar;
+        private final String login;
+        private final String senha;
 
-        public IntegracaoTask(String jsonProdutos, String jsonPerdas, String urlWs, String timeOut, ProgressBar progressBar) {
+        public IntegracaoTask(String jsonProdutos, String jsonPerdas, String urlWs, String timeOut, ProgressBar progressBar, String login, String senha) {
             this.jsonProdutos = jsonProdutos;
             this.jsonPerdas = jsonPerdas;
             this.urlWs = urlWs;
             this.timeOut = timeOut;
             this.progressBar = progressBar;
+            this.login = login;
+            this.senha = senha;
         }
 
         @Override
@@ -417,67 +405,56 @@ public class ActivityList extends AppCompatActivity {
         protected Void doInBackground(Void... params) {
             Gson gson = new Gson();
             String urlCnx = urlWs + "integracao?ctipo=PR";
-            StringBuilder execucao = new StringBuilder();
             HttpsURLConnection urlConnection = null;
 
-            if (android.os.Debug.isDebuggerConnected())
-                android.os.Debug.waitForDebugger();
-
             try {
-                // Configuração do SSL
+                // SSL TrustManager
                 final X509TrustManager cert = new X509TrustManager() {
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-
-                    public void checkServerTrusted(X509Certificate[] certs, String authType) throws java.security.cert.CertificateException {
-                        return;
-                    }
-
-                    public void checkClientTrusted(X509Certificate[] certs, String authType) throws java.security.cert.CertificateException {
-                        return;
-                    }
+                    public X509Certificate[] getAcceptedIssuers() { return null; }
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) {}
                 };
 
-                // Cria socket SSL
                 SSLContext sc = SSLContext.getInstance("SSL");
-                sc.init(null, new TrustManager[] { cert }, null);
-
-                // Ativa o socket para a requisição
+                sc.init(null, new TrustManager[]{cert}, new java.security.SecureRandom());
                 HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
-                final HostnameVerifier hv = new HostnameVerifier() {
-                    public boolean verify(String urlHostName, SSLSession session) {
-                        return true;
-                    }
-                };
+                HostnameVerifier hv = (hostname, session) -> true;
 
+                // Configuração da conexão
                 URL url = new URL(urlCnx);
                 urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setDefaultHostnameVerifier(hv);
                 urlConnection.setUseCaches(false);
                 urlConnection.setReadTimeout(10000);
-                urlConnection.setConnectTimeout(Integer.valueOf(timeOut));
+                urlConnection.setConnectTimeout(Integer.parseInt(timeOut));
                 urlConnection.setDoInput(true);
                 urlConnection.setDoOutput(true);
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setRequestProperty("Content-Type", "application/json");
+
+                // Adiciona cabeçalho Basic Auth
+                String credentials = login + ":" + senha;
+                String basicAuth = "Basic " + android.util.Base64.encodeToString(credentials.getBytes(), android.util.Base64.NO_WRAP);
+                urlConnection.setRequestProperty("Authorization", basicAuth);
+
                 urlConnection.setFixedLengthStreamingMode(jsonProdutos.length());
                 urlConnection.connect();
 
-                Log.d("Return Truck:produtos ", jsonProdutos);
-                Log.d("Return Truck:perdas ", jsonPerdas);
-                OutputStreamWriter os = new OutputStreamWriter(urlConnection.getOutputStream());
-                os.write(jsonProdutos);
-                os.flush();
-                os.close();
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                String linha;
-                StringBuffer buffer = new StringBuffer();
-                while ((linha = reader.readLine()) != null) {
-                    buffer.append(linha + "\n");
+                // Envia os dados
+                try (OutputStreamWriter os = new OutputStreamWriter(urlConnection.getOutputStream())) {
+                    os.write(jsonProdutos);
+                    os.flush();
                 }
+
+                // Lê a resposta
+                BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                StringBuilder buffer = new StringBuilder();
+                String linha;
+                while ((linha = reader.readLine()) != null) {
+                    buffer.append(linha).append("\n");
+                }
+                reader.close();
 
                 Type collectionType = new TypeToken<Integracao>() {}.getType();
                 Integracao integracao = gson.fromJson(buffer.toString(), collectionType);
@@ -488,17 +465,18 @@ public class ActivityList extends AppCompatActivity {
                 }
 
             } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
-                e.printStackTrace();
+                Log.e("IntegracaoTask", "Erro: " + e.getMessage(), e);
             } finally {
                 if (urlConnection != null) {
                     urlConnection.disconnect();
                 }
             }
 
-            Log.d("Integração ", integracaows.toString());
+            Log.d("Integração", integracaows.toString());
             return null;
         }
     }
+
 
     /**
      * Finaliza operação Return Truck
@@ -529,6 +507,7 @@ public class ActivityList extends AppCompatActivity {
     /**
      * Salva os dados da carga no servidor
      */
+    @SuppressLint("SimpleDateFormat")
     private void salvarDados() {
         progressBar = findViewById(R.id.progressBar);
 
@@ -562,6 +541,8 @@ public class ActivityList extends AppCompatActivity {
             produtos.get(y).setRetcarga(edtret.getText().toString());
             produtos.get(y).setBonificacao(edtbonif.getText().toString());
             produtos.get(y).setPerda(edtperda.getText().toString());
+            produtos.get(y).setDataAcerto(new SimpleDateFormat("dd/MM/yyyy").format(new Date()));
+            produtos.get(y).setNotasFiscais("");
         }
 
         // Converte objetos para JSON
@@ -579,8 +560,18 @@ public class ActivityList extends AppCompatActivity {
             timeOut = dadosWs[1];
 
             // Inicia a gravação dos dados
-            IntegracaoTask integracaoTask = new IntegracaoTask(jsonProdutos, jsonPerdas, urlWs, timeOut, progressBar);
+            IntegracaoTask integracaoTask = new IntegracaoTask(jsonProdutos, jsonPerdas, urlWs, timeOut, progressBar, usuario, senha);
             integracaoTask.execute();
+
+            Toast.makeText(ActivityList.this, "O formulário de devolução foi entregue com sucesso!", Toast.LENGTH_SHORT).show();
+            Intent itInit = new Intent(this, ActivityInit.class);
+            it.putExtra("rota", rota.toString());
+            it.putExtra("desrota", desrota.toString());
+            it.putExtra("usuario", usuario);
+            it.putExtra("senha", senha);
+            startActivityForResult(it, 1);
+            startActivity(itInit);
+
         } else {
             Toast.makeText(ActivityList.this, "Não foi possível carregar o endereço ws Protheus. Verifique com administrador.", Toast.LENGTH_SHORT).show();
         }

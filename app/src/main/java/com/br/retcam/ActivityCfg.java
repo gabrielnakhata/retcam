@@ -85,9 +85,9 @@ public class ActivityCfg extends AppCompatActivity {
 
             if (setInsertWs(ws, timeout)) {
                 Toast.makeText(this, "Dados salvos com sucesso!", Toast.LENGTH_SHORT).show();
-                Intent itInit = new Intent(this, ActivityInit.class);
-                startActivity(itInit);
-//                finish();
+//                Intent itInit = new Intent(this, ActivityInit.class);
+//                startActivity(itInit);
+                finish();
             } else {
                 Toast.makeText(this, "Erro ao salvar os dados!", Toast.LENGTH_SHORT).show();
                 retorno = false;

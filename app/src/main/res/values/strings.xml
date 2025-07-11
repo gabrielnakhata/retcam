@@ -28,7 +28,7 @@
     <string name="btn_rota">Rota  </string>
     <string name="lyd_desrota">Descrição Rota  </string>
     <string name="lyd_aguarde">Aguarde... </string>
-    <string name="lyd_versao">Versão 1.5</string>
+    <string name="lyd_versao">Versão 2.0</string>
     <string name="title_activity_perda">activity_perda</string>
     <string name="lyd_tela">Inclusão de Perdas</string>
     <string name="lyd_perdaPrd">Produto</string>

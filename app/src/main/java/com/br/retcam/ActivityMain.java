@@ -124,6 +124,7 @@ public class ActivityMain extends AppCompatActivity {
             // Login bem sucedido, abre tela inicial
             Intent itInit = new Intent(this, ActivityInit.class);
             itInit.putExtra("usuario", txtLogin.getText().toString());
+            itInit.putExtra("senha", txtSenha.getText().toString());
             limparCampos();
             startActivity(itInit);
         } else {
@@ -137,6 +138,102 @@ public class ActivityMain extends AppCompatActivity {
     /**
      * Task assíncrona para executar conexão com WebService de login
      */
+//    private class LoginTask extends AsyncTask<Void, Void, Void> {
+//
+//        private final String login;
+//        private final String senha;
+//        private final String urlWs;
+//        private final String timeOut;
+//        private final ProgressBar progressBar;
+//
+//        public LoginTask(String login, String senha, String urlWs, String timeOut, ProgressBar progressBar) {
+//            this.login = login;
+//            this.senha = senha;
+//            this.urlWs = urlWs;
+//            this.timeOut = timeOut;
+//            this.progressBar = progressBar;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Void result) {
+//            super.onPostExecute(result);
+//            progressBar.setVisibility(View.GONE);
+//            retLogin();
+//        }
+//
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//            progressBar.setVisibility(ProgressBar.VISIBLE);
+//        }
+//
+//        @Override
+//        protected Void doInBackground(Void... params) {
+//            try {
+//                Gson gson = new Gson();
+//                String urlCnx = urlWs + "athusr?CUSUARIO=" + login + "&CSENHA=" + senha;
+//                StringBuilder execucao = new StringBuilder();
+//                HttpsURLConnection urlConnection = null;
+//
+//                try {
+//                    // Configuração de certificados SSL
+//                    final X509TrustManager cert = new X509TrustManager() {
+//                        public X509Certificate[] getAcceptedIssuers() {
+//                            return null;
+//                        }
+//
+//                        public void checkServerTrusted(X509Certificate[] certs, String authType) {
+//                            // Não verifica certificados no ambiente de desenvolvimento
+//                        }
+//
+//                        public void checkClientTrusted(X509Certificate[] certs, String authType) {
+//                            // Não verifica certificados no ambiente de desenvolvimento
+//                        }
+//                    };
+//
+//                    // Cria socket SSL
+//                    SSLContext sc = SSLContext.getInstance("SSL");
+//                    sc.init(null, new TrustManager[]{cert}, null);
+//
+//                    // Ativa o socket para a requisição
+//                    HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+//
+//                    final HostnameVerifier hv = new HostnameVerifier() {
+//                        public boolean verify(String urlHostName, SSLSession session) {
+//                            return true;
+//                        }
+//                    };
+//
+//                    URL url = new URL(urlCnx);
+//                    urlConnection = (HttpsURLConnection) url.openConnection();
+//                    urlConnection.setDefaultHostnameVerifier(hv);
+//                    urlConnection.setRequestMethod("GET");
+//                    urlConnection.setRequestProperty("Content-type", "application/json");
+//                    urlConnection.setRequestProperty("Accept", "application/json");
+//                    urlConnection.setDoOutput(true);
+//                    urlConnection.setConnectTimeout(Integer.parseInt(timeOut));
+//                    urlConnection.connect();
+//
+//                    Scanner scanner = new Scanner(url.openStream());
+//                    while (scanner.hasNext()) {
+//                        execucao.append(scanner.next());
+//                    }
+//                    scanner.close();
+//
+//                    conexaows = gson.fromJson(execucao.toString(), Login.class);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                } finally {
+//                    if (urlConnection != null) {
+//                        urlConnection.disconnect();
+//                    }
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            return null;
+//        }
+//    }
     private class LoginTask extends AsyncTask<Void, Void, Void> {
 
         private final String login;
@@ -154,16 +251,16 @@ public class ActivityMain extends AppCompatActivity {
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             progressBar.setVisibility(View.GONE);
             retLogin();
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressBar.setVisibility(ProgressBar.VISIBLE);
         }
 
         @Override
@@ -175,51 +272,33 @@ public class ActivityMain extends AppCompatActivity {
                 HttpsURLConnection urlConnection = null;
 
                 try {
-                    // Configuração de certificados SSL
-                    final X509TrustManager cert = new X509TrustManager() {
-                        public X509Certificate[] getAcceptedIssuers() {
-                            return null;
-                        }
-
-                        public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                            // Não verifica certificados no ambiente de desenvolvimento
-                        }
-
-                        public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                            // Não verifica certificados no ambiente de desenvolvimento
-                        }
-                    };
-
-                    // Cria socket SSL
+                    // Configuração SSL que ignora certificados inválidos (dev only)
                     SSLContext sc = SSLContext.getInstance("SSL");
-                    sc.init(null, new TrustManager[]{cert}, null);
-
-                    // Ativa o socket para a requisição
+                    sc.init(null, new TrustManager[]{getTrustAllCertsManager()}, new java.security.SecureRandom());
                     HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-                    final HostnameVerifier hv = new HostnameVerifier() {
-                        public boolean verify(String urlHostName, SSLSession session) {
-                            return true;
-                        }
-                    };
+                    HttpsURLConnection.setDefaultHostnameVerifier(getTrustAllHostnames());
 
                     URL url = new URL(urlCnx);
                     urlConnection = (HttpsURLConnection) url.openConnection();
-                    urlConnection.setDefaultHostnameVerifier(hv);
                     urlConnection.setRequestMethod("GET");
-                    urlConnection.setRequestProperty("Content-type", "application/json");
-                    urlConnection.setRequestProperty("Accept", "application/json");
-                    urlConnection.setDoOutput(true);
                     urlConnection.setConnectTimeout(Integer.parseInt(timeOut));
-                    urlConnection.connect();
+                    urlConnection.setRequestProperty("Content-Type", "application/json");
+                    urlConnection.setRequestProperty("Accept", "application/json");
 
-                    Scanner scanner = new Scanner(url.openStream());
-                    while (scanner.hasNext()) {
-                        execucao.append(scanner.next());
+                    // Adiciona cabeçalho Basic Auth
+                    String credentials = login + ":" + senha;
+                    String basicAuth = "Basic " + android.util.Base64.encodeToString(credentials.getBytes(), android.util.Base64.NO_WRAP);
+                    urlConnection.setRequestProperty("Authorization", basicAuth);
+
+                    // Faz a conexão e leitura da resposta
+                    try (Scanner scanner = new Scanner(urlConnection.getInputStream())) {
+                        while (scanner.hasNext()) {
+                            execucao.append(scanner.next());
+                        }
                     }
-                    scanner.close();
 
                     conexaows = gson.fromJson(execucao.toString(), Login.class);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -232,5 +311,25 @@ public class ActivityMain extends AppCompatActivity {
             }
             return null;
         }
+
+        private X509TrustManager getTrustAllCertsManager() {
+            return new X509TrustManager() {
+                public X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[]{};
+                }
+
+                public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+
+                public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+            };
+        }
+
+        private HostnameVerifier getTrustAllHostnames() {
+            return (hostname, session) -> true;
+        }
     }
+
 }
+
+
+
