@@ -1,6 +1,7 @@
 package com.br.retcam;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -10,18 +11,20 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Toast;
+
 import com.br.retcam.entity.Rota;
 import com.google.gson.Gson;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.security.cert.X509Certificate;
-import javax.net.ssl.HostnameVerifier;
+
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -38,6 +41,9 @@ public class ActivityInit extends AppCompatActivity {
     private EditText txtVend;
     private EditText txtDesrota;
     private EditText txtQtdcx;
+    private Spinner spnDataAcerto;
+    private String dataAcertoSelecionada = "";
+    private String[] datasAcerto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +57,7 @@ public class ActivityInit extends AppCompatActivity {
         txtQtdcx = findViewById(R.id.txt_qtdcx);
         progressBar = findViewById(R.id.progressBar);
         progressBar2 = findViewById(R.id.progressBar2);
+        spnDataAcerto = findViewById(R.id.spn_data_acerto);
 
         Intent it = getIntent();
         usuario = it.getStringExtra("usuario");
@@ -85,11 +92,7 @@ public class ActivityInit extends AppCompatActivity {
     }
 
     public boolean setRotPrd(View view) {
-        if (txtCodigo.getText().toString().isEmpty() ||
-                txtRota.getText().toString().isEmpty() ||
-                txtVend.getText().toString().isEmpty() ||
-                txtQtdcx.getText().toString().isEmpty() ||
-                txtDesrota.getText().toString().isEmpty()) {
+        if (txtCodigo.getText().toString().isEmpty() || txtRota.getText().toString().isEmpty() || txtVend.getText().toString().isEmpty() || txtQtdcx.getText().toString().isEmpty() || txtDesrota.getText().toString().isEmpty()) {
 
             Toast.makeText(this, "Informe todos os campos do formulário!", Toast.LENGTH_SHORT).show();
             return false;
@@ -97,6 +100,11 @@ public class ActivityInit extends AppCompatActivity {
 
         if (!rotaDig.equals(txtRota.getText().toString())) {
             Toast.makeText(this, "Rota inválida. Informe novamente!", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (dataAcertoSelecionada.isEmpty()) {
+            Toast.makeText(this, "Selecione uma data de acerto!", Toast.LENGTH_SHORT).show();
             return false;
         }
 
@@ -110,6 +118,7 @@ public class ActivityInit extends AppCompatActivity {
         it.putExtra("qtdcx", txtQtdcx.getText().toString());
         it.putExtra("usuario", usuario);
         it.putExtra("senha", senha);
+        it.putExtra("dataAcerto", dataAcertoSelecionada);
         startActivityForResult(it, 1);
         return true;
     }
@@ -146,6 +155,42 @@ public class ActivityInit extends AppCompatActivity {
         txtCodigo.setText(conexaRota.getVendedor());
         txtVend.setText(conexaRota.getNome_vend());
 
+        if (conexaRota.getDataAcerto() != null && !conexaRota.getDataAcerto().isEmpty()) {
+            datasAcerto = conexaRota.getDataAcerto().split("#");
+
+            String[] datasComSelecao = new String[datasAcerto.length + 1];
+            datasComSelecao[0] = "Selecione uma data...";
+            System.arraycopy(datasAcerto, 0, datasComSelecao, 1, datasAcerto.length);
+
+            android.widget.ArrayAdapter<String> adapter = new android.widget.ArrayAdapter<>(this, R.layout.spinner_item, datasComSelecao);
+            adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+            spnDataAcerto.setAdapter(adapter);
+
+            dataAcertoSelecionada = "";
+
+            spnDataAcerto.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                    if (position > 0) {
+                        dataAcertoSelecionada = datasAcerto[position - 1];
+                    } else {
+                        dataAcertoSelecionada = "";
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                    dataAcertoSelecionada = "";
+                }
+            });
+
+        } else {
+            // Se vier vazio, limpe o spinner
+            spnDataAcerto.setAdapter(null);
+            dataAcertoSelecionada = "";
+        }
+
+
         return true;
     }
 
@@ -158,10 +203,10 @@ public class ActivityInit extends AppCompatActivity {
 
     /**
      * Fecha o aplicativo quando o botão de fechar é pressionado
+     *
      * @param view View que disparou o evento
      */
     public void fecharApp(View view) {
-        // Finaliza todas as atividades e fecha o aplicativo
         finishAffinity();
         System.exit(0);
     }
@@ -232,9 +277,15 @@ public class ActivityInit extends AppCompatActivity {
 
         private X509TrustManager getTrustAllCertsManager() {
             return new X509TrustManager() {
-                public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
-                public void checkClientTrusted(X509Certificate[] certs, String authType) {}
-                public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+                public X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[0];
+                }
+
+                public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                }
+
+                public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                }
             };
         }
     }

@@ -8,6 +8,7 @@ public class Rota {
     private String vendedor = "";
     private String nome_vend = "";
     private String msg = "";
+    private String dataAcerto = "";
 
     public boolean getRetorno() {
         return retorno;
@@ -57,6 +58,14 @@ public class Rota {
         this.msg = msg;
     }
 
+    public String getDataAcerto() {
+        return dataAcerto;
+    }
+
+    public void setDataAcerto(String dataAcerto) {
+        this.dataAcerto = dataAcerto;
+    }
+
     @Override
     public String toString() {
         return "Rota{" +
@@ -66,6 +75,7 @@ public class Rota {
                 ", vendedor='" + vendedor + '\'' +
                 ", nome_vend='" + nome_vend + '\'' +
                 ", msg='" + msg + '\'' +
+                ", dataAcerto='" + dataAcerto + '\'' +
                 '}';
     }
 }
