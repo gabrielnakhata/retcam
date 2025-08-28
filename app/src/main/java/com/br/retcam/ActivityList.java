@@ -559,8 +559,8 @@ public class ActivityList extends AppCompatActivity {
         String nomevend = it.getStringExtra("nomevend");
         String qtdcx = it.getStringExtra("qtdcx");
         String usuario = it.getStringExtra("usuario");
+        String dataAcerto = it.getStringExtra("dataAcerto");
 
-        // Atualiza os dados dos produtos com as quantidades informadas
         for (int y = 0; y < produtos.size(); y++) {
             // Recupera os campos da UI
             @SuppressLint("ResourceType") EditText txtDev = findViewById(100 + y);
@@ -581,7 +581,7 @@ public class ActivityList extends AppCompatActivity {
             produtos.get(y).setRetcarga(edtret.getText().toString());
             produtos.get(y).setBonificacao(edtbonif.getText().toString());
             produtos.get(y).setPerda(edtperda.getText().toString());
-            produtos.get(y).setDataAcerto(new SimpleDateFormat("dd/MM/yyyy").format(new Date()));
+            produtos.get(y).setDataAcerto(dataAcerto);
             produtos.get(y).setNotasFiscais("");
         }
 
@@ -696,4 +696,3 @@ public class ActivityList extends AppCompatActivity {
         alerta.show();
     }
 }
-

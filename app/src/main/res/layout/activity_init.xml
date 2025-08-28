@@ -6,210 +6,217 @@
     android:layout_height="match_parent"
     tools:context=".ActivityInit">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@+id/btn_fechar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="480dp"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_alignParentTop="true">
-            tools:layout_editor_absoluteX="1dp"
-            tools:layout_editor_absoluteY="1dp">
+            android:paddingStart="16dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="24dp">
 
             <TextView
                 android:id="@+id/lyd_inf"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
                 android:text="@string/txt_infinit"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <View
                 android:id="@+id/divider"
-                android:layout_width="wrap_content"
-                android:layout_height="3dp"
-                android:layout_marginLeft="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="8dp"
                 android:background="?android:attr/listDivider" />
 
             <TextView
                 android:id="@+id/lyd_rota"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
+                android:layout_marginTop="16dp"
                 android:text="@string/txt_rota" />
 
-            <EditText
-                android:id="@+id/txt_rota"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:ems="10"
-                android:inputType="number"
-                android:singleLine="false"
-                android:text=""
-                android:textStyle="bold" />
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/btn_rota"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_marginRight="10dp"
-                android:layout_weight="1"
-                android:text="@string/btn_rota"
-                android:onClick="setRota"
-                app:backgroundTint="#FFA500" />
+                <EditText
+                    android:id="@+id/txt_rota"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:inputType="number"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btn_rota"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:onClick="setRota"
+                    android:text="@string/btn_rota"
+                    app:backgroundTint="#FFA500" />
+            </LinearLayout>
 
             <View
                 android:id="@+id/divider2"
-                android:layout_width="wrap_content"
-                android:layout_height="3dp"
-                android:layout_marginLeft="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
                 android:background="?android:attr/listDivider" />
 
             <TextView
                 android:id="@+id/lyd_desrota"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:text="@string/lyd_desrota"
-                tools:layout_editor_absoluteX="20dp"
-                tools:layout_editor_absoluteY="30dp" />
+                android:layout_marginTop="16dp"
+                android:text="@string/lyd_desrota" />
 
             <EditText
                 android:id="@+id/txt_desrota"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:ems="10"
-                android:inputType="number"
-                android:text=""
+                android:layout_marginTop="6dp"
                 android:enabled="false"
+                android:inputType="text"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/lyd_codigo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:text="@string/txt_numero"
-                tools:layout_editor_absoluteX="20dp"
-                tools:layout_editor_absoluteY="30dp" />
+                android:layout_marginTop="16dp"
+                android:text="@string/txt_numero" />
 
             <EditText
                 android:id="@+id/txt_codigo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:ems="10"
-                android:inputType="number"
-                android:text=""
+                android:layout_marginTop="6dp"
                 android:enabled="false"
+                android:inputType="number"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/lyd_vend"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
+                android:layout_marginTop="16dp"
                 android:text="@string/txt_vend" />
 
             <EditText
                 android:id="@+id/txt_vend"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:text=""
+                android:layout_marginTop="6dp"
                 android:enabled="false"
+                android:inputType="textPersonName"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/lyd_qtdcx"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
+                android:layout_marginTop="16dp"
                 android:text="@string/lyd_qtdpce" />
 
             <EditText
                 android:id="@+id/txt_qtdcx"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:ems="10"
+                android:layout_marginTop="6dp"
                 android:inputType="number"
-                android:text=""
                 android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/btn_avancar"
+            <TextView
+                android:id="@+id/lyd_data_acerto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_marginRight="10dp"
-                android:layout_weight="1"
-                android:text="@string/btn_avancar"
-                android:onClick="setRotPrd"
-                app:backgroundTint="#FFA500" />
+                android:layout_marginTop="16dp"
+                android:text="Data de Acerto:" />
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/ldn_rota"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:orientation="vertical"
-            android:layout_marginTop="80dp">
-
-            <ProgressBar
-                android:layout_width="40dp"
+            <Spinner
+                android:id="@+id/spn_data_acerto"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="?android:attr/progressBarStyleLarge"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                android:id="@+id/progressBar"/>
+                android:layout_marginTop="6dp" />
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/ldn_avc"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:orientation="vertical"
-            android:layout_marginTop="480dp">
-
-            <ProgressBar
-                android:layout_width="40dp"
+            <LinearLayout
+                android:id="@+id/ldn_rota"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="?android:attr/progressBarStyleLarge"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                android:id="@+id/progressBar2"/>
+                android:layout_marginTop="16dp"
+                android:gravity="center">
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="end"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_avancar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="setRotPrd"
+                    android:text="@string/btn_avancar"
+                    app:backgroundTint="#FFA500" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ldn_avc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center">
+
+                <ProgressBar
+                    android:id="@+id/progressBar2"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:visibility="gone" />
+            </LinearLayout>
 
         </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-        <!-- Botão de fechar no rodapé -->
-        <Button
-            android:id="@+id/btn_fechar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:text="Fechar Aplicativo"
-            android:onClick="fecharApp"
-            android:backgroundTint="#FF0000"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold" />
-
-    </RelativeLayout>
+    <Button
+        android:id="@+id/btn_fechar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:onClick="fecharApp"
+        android:text="Fechar Aplicativo"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        app:backgroundTint="#FF0000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
